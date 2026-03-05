@@ -1,10 +1,12 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+
 from app.services.transaction_service import (
     calculate_net_savings,
     get_transactions
 )
+
 from app.components.charts import (
     monthly_trend_chart,
     category_bar_chart,
@@ -15,8 +17,8 @@ from app.components.charts import (
 def show():
     st.title("📊 Dashboard")
 
-    if "user_id" not in st.session_state:
-        st.warning("Please login first.")
+    if "user_id" not in st.session_state or not st.session_state["user_id"]:
+        st.warning("Please login first")
         st.stop()
 
     user_id = st.session_state["user_id"]
@@ -51,7 +53,7 @@ def show():
     st.divider()
 
     #visualize spendings
-    visualize_spending()
+    visualize_spending(transactions_df)
 
     # --- Bottom Section ---
     col_left, col_right = st.columns([2, 1])
