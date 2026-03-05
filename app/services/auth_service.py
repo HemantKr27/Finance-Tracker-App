@@ -28,21 +28,35 @@ def register_user(username, password):
 
 
 def authenticate_user(username, password):
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT id, password_hash FROM users WHERE username = ?",
+        "SELECT id, username, password_hash FROM users WHERE username = ?",
         (username,)
     )
 
     user = cursor.fetchone()
     conn.close()
 
-    if user:
-        stored_hash = user["password_hash"]
+    if user and bcrypt.checkpw(password.encode(), user["password_hash"]):
+        return user["id"], user["username"]
 
-        if bcrypt.checkpw(password.encode("utf-8"), stored_hash):
-            return user["id"]
+    return None, None
 
-    return None
+
+def get_username(user_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT username FROM users WHERE id = ?",
+        (user_id,)
+    )
+
+    user = cursor.fetchone()
+    conn.close()
+
+    return user["username"] if user else None

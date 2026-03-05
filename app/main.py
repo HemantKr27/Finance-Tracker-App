@@ -4,6 +4,8 @@ from app.pages import budget, login, register, dashboard, transactions, analytic
 from app.database.models import create_tables
 from app.services.jwt_handler import verify_token
 from app.utils.cookie_manager import cookies
+from app.pages.dashboard import show_dashboard  
+from app.services.auth_service import get_username
 
 
 def init_session():
@@ -53,7 +55,7 @@ def show_app_pages():
     """Main application navigation"""
 
     pages = {
-        "Dashboard": dashboard.show,
+        "Dashboard": dashboard.show_dashboard,
         "Add Transaction": transactions.show_add,
         "History": transactions.show_history,
         "Analytics": analytics.show,
@@ -88,7 +90,9 @@ def main():
     init_session()
     restore_login()
 
-    st.sidebar.title("💰 Finance Tracker")
+    st.sidebar.title("Finance Tracker")
+    if st.session_state.get("username"):
+        st.sidebar.success(f"👤 {st.session_state['username']}")
     st.sidebar.markdown("---")
 
     if st.session_state.user_id:

@@ -11,7 +11,7 @@ from app.services.category_service import get_categories
 
 def show():
 
-    st.subheader("📊 Budget Manager")
+    st.subheader("Budget Manager")
 
     if "user_id" not in st.session_state:
         st.warning("Please log in first.")

@@ -18,20 +18,21 @@ def show():
             st.warning("Please enter username and password")
             return
 
-        user_id = authenticate_user(username, password)
+        user_id, username_db = authenticate_user(username, password)
 
         if user_id:
 
             # create JWT token
             token = create_token(user_id)
 
-            #store JWT token
+            # store JWT cookie
             cookies["jwt_token"] = token
             cookies.save()
 
             # save session
             st.session_state["token"] = token
             st.session_state["user_id"] = user_id
+            st.session_state["username"] = username_db
             st.session_state["page"] = "Dashboard"
 
             st.success("Login successful!")

@@ -1,74 +1,53 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-import pandas as pd
 import plotly.express as px
 
-def visualize_spending(transactions_df):
-    st.markdown("<hr style='border:2px solid #D3D3D3;'>", unsafe_allow_html=True)
-    st.subheader("bar graph")
-    if not transactions_df.empty:
-        category_summary = transactions_df.groupby(["category","type"])["amount"].sum().unstack(fill_value=0)
 
-        st.bar_chart(category_summary)
-        st.markdown("<hr style='border:2px solid #D3D3D3;'>", unsafe_allow_html=True)
+def visualize_spending(df):
 
+    expense_df = df[df["type"] == "Expense"]
 
-        # Pie chart for income and expense
-        st.subheader("pie chart")
-        type_summary = transactions_df.groupby("category")["amount"].sum()
-        fig1, ax1 = plt.subplots()
-        ax1.pie(type_summary, labels=type_summary.index, autopct='%1.1f%%', startangle=90)
-        ax1.axis("equal")
-        st.pyplot(fig1)
-
-        #line chart for spending trend
-        st.markdown("<hr style='border:2px solid #D3D3D3;'>", unsafe_allow_html=True)
-        st.subheader("Spending Trend")
-        if not transactions_df.empty:
-            transactions_df['date'] = pd.to_datetime(transactions_df['date'])
-            trends = transactions_df.groupby(["date", "type"])["amount"].sum().unstack(fill_value=0)
-
-            st.line_chart(trends)
-    else:
-        st.info("No transactions to display analytics.")
-
-
-def monthly_trend_chart(df):
-    monthly = (
-        df.groupby([df["date"].dt.to_period("M"), "type"])["amount"]
-        .sum()
-        .unstack(fill_value=0)
-    )
-
-    monthly.index = monthly.index.astype(str)
-
-    st.line_chart(monthly)
-
-
-def category_bar_chart(df):
-    summary = (
-        df[df["type"] == "Expense"]
-        .groupby("category")["amount"]
-        .sum()
-        .sort_values(ascending=False)
-    )
-
-    st.bar_chart(summary)
-
-
-
-
-def visualize_category_spending(df):
-
-    if df.empty:
-        st.info("No data to display")
+    if expense_df.empty:
+        st.info("No expense data available.")
         return
 
+    category_spending = (
+        expense_df.groupby("category")["amount"]
+        .sum()
+        .reset_index()
+    )
+
     fig = px.pie(
-        df,
-        values="total",
+        category_spending,
         names="category",
-        title="Spending by Category"
+        values="amount",
+        title="Spending by Category",
+        hole=0.4
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def monthly_spending_chart(df):
+
+    if df.empty:
+        st.info("No transaction data.")
+        return
+
+    df["date"] = df["date"].astype("datetime64[ns]")
+    df["month"] = df["date"].dt.to_period("M").astype(str)
+
+    monthly = (
+        df.groupby("month")["amount"]
+        .sum()
+        .reset_index()
+    )
+
+    fig = px.line(
+        monthly,
+        x="month",
+        y="amount",
+        markers=True,
+        title="Monthly Spending Trend"
     )
 
     st.plotly_chart(fig, use_container_width=True)
