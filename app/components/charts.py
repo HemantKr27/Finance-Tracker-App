@@ -1,6 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.express as px
 
 def visualize_spending(transactions_df):
     st.markdown("<hr style='border:2px solid #D3D3D3;'>", unsafe_allow_html=True)
@@ -53,3 +54,21 @@ def category_bar_chart(df):
     )
 
     st.bar_chart(summary)
+
+
+
+
+def visualize_category_spending(df):
+
+    if df.empty:
+        st.info("No data to display")
+        return
+
+    fig = px.pie(
+        df,
+        values="total",
+        names="category",
+        title="Spending by Category"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)

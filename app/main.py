@@ -1,6 +1,6 @@
 import streamlit as st
 
-from app.pages import login, register, dashboard, transactions, analytics
+from app.pages import budget, login, register, dashboard, transactions, analytics
 from app.database.models import create_tables
 from app.services.jwt_handler import verify_token
 from app.utils.cookie_manager import cookies
@@ -56,7 +56,8 @@ def show_app_pages():
         "Dashboard": dashboard.show,
         "Add Transaction": transactions.show_add,
         "History": transactions.show_history,
-        "Analytics": analytics.show
+        "Analytics": analytics.show,
+        "Budget": budget.show
     }
 
     menu = list(pages.keys()) + ["Logout"]
